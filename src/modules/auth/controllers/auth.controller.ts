@@ -14,7 +14,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
-  async singIn(@Body() body: IAuth, @Res() $res) {
+  async singIn(@Body() body: IAuth, @Res() res) {
     const user = await this.userService.findOne(body.email);
 
     if (user) {
@@ -24,23 +24,25 @@ export class AuthController {
       );
 
       if (!comparePW) {
-        return $res.status(HttpStatus.UNAUTHORIZED).json({
+        return res.status(HttpStatus.UNAUTHORIZED).json({
           message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
         });
       }
+      delete user.password;
+
       const userInfo = {
         ...user,
       };
 
       const accessToken = await this.cryptoService.createToken(userInfo);
 
-      return $res.status(HttpStatus.OK).json({
+      return res.status(HttpStatus.OK).json({
         user: userInfo,
         accessToken,
       });
     }
 
-    return $res.status(HttpStatus.UNAUTHORIZED).json({
+    return res.status(HttpStatus.UNAUTHORIZED).json({
       message: 'ไม่พบผู้ใช้งานนี้ภายในระบบ',
     });
   }
